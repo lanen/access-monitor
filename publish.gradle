@@ -1,0 +1,30 @@
+apply plugin: 'maven-publish'
+
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+
+    }
+
+    repositories{
+        maven{
+            url "http://192.168.0.169:8081/nexus/content/repositories/snapshots"
+            credentials {
+                username 'admin'
+                password 'admin123'
+            }
+        }
+    }
+}
