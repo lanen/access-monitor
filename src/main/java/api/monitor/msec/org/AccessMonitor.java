@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * Created by Administrator on 2016/5/19.
  */
-public class AccessMonitor {
+class AccessMonitor {
+
+    public static boolean LOAD_SO = false;
     static {
         if (System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") < 0) {
             try {
@@ -26,6 +29,7 @@ public class AccessMonitor {
                 in.close();
                 out.close();
                 System.load(f.getAbsolutePath());
+                LOAD_SO = true;
                 f.delete();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -84,5 +88,7 @@ public class AccessMonitor {
         AccessMonitor.initServiceName("TestModuleName");
 
         AccessMonitor.add("test", 1);
+
+
     }
 }
