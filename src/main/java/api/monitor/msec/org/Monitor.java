@@ -16,10 +16,7 @@ public final class Monitor {
 
     private Monitor(){
 
-        if (System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") < 0) {
-
-
-
+        if ( System.getProperty("os.name").toUpperCase().contains("WINDOWS") ) {
             monitor= new TxWindowMonitor();
         }else {
             AccessMonitor.getInstance();

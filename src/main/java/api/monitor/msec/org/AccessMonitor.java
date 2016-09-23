@@ -12,10 +12,26 @@ import java.util.Arrays;
 class AccessMonitor {
 
     public static boolean LOAD_SO = false;
+
     static {
-        if (System.getProperties().getProperty("os.name").toUpperCase().indexOf("WINDOWS") < 0) {
+        load("/sofiles/libjni_monitor.so");
+    }
+
+    private AccessMonitor() {
+    }
+
+    private static AccessMonitor s_instance = new AccessMonitor();
+
+
+    /**
+     *
+     * @param soFile
+     */
+    private static void load(String soFile){
+
+        if ( ! System.getProperty("os.name").toUpperCase().contains("WINDOWS") ) {
             try {
-                InputStream in = AccessMonitor.class.getClass().getResourceAsStream("/sofiles/libjni_monitor.so");
+                InputStream in = AccessMonitor.class.getClass().getResourceAsStream(soFile);
                 File f = File.createTempFile("libjni_monitor", ".so");
                 OutputStream out = new FileOutputStream(f);
                 byte[] buf = new byte[10240];
@@ -36,11 +52,6 @@ class AccessMonitor {
             }
         }
     }
-
-    private AccessMonitor() {
-    }
-
-    private static AccessMonitor s_instance = new AccessMonitor();
 
     public static AccessMonitor getInstance() {
         return s_instance;
