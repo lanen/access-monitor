@@ -9,13 +9,21 @@ public class TxNativeMonitor implements TxMonitor {
 
     @Override
     public boolean initialize(String filename) {
-        return AccessMonitor.initialize(filename);
+        try{
+            return AccessMonitor.initialize(filename);
+        }catch (Throwable e){
+        }
+        return false;
     }
 
     @Override
     public boolean initializeServiceName(String serviceName) {
-        AccessMonitor.initServiceName(serviceName);
-        return true;
+        try{
+            AccessMonitor.initServiceName(serviceName);
+            return true;
+        }catch (Throwable e){
+        }
+        return false;
     }
 
     @Override
@@ -24,8 +32,11 @@ public class TxNativeMonitor implements TxMonitor {
         if (AccessMonitor.getInstance().serviceName == null){
             throw new IllegalArgumentException(" class initializeServiceName first ");
         }
-
-        return AccessMonitor.add(attrName,value);
+        try{
+            return AccessMonitor.add(attrName,value);
+        }catch (Throwable e){
+        }
+        return false;
     }
 
     @Override
@@ -34,7 +45,11 @@ public class TxNativeMonitor implements TxMonitor {
         if (AccessMonitor.getInstance().serviceName == null){
             throw new IllegalArgumentException(" class initializeServiceName first ");
         }
-        return AccessMonitor.set(attrName,value);
+        try{
+            return AccessMonitor.set(attrName,value);
+        }catch (Throwable e){
+        }
+        return false;
     }
 
 

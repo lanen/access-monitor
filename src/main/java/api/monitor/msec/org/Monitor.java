@@ -20,7 +20,7 @@ public final class Monitor {
             monitor= new TxWindowMonitor();
         }else {
             AccessMonitor.getInstance();
-            if ( ! AccessMonitor.LOAD_SO){
+            if ( ! AccessMonitor.LOAD_SO ){
                 System.err.println("warn /sofiles/libjni_monitor.so failed ");
                 monitor = null;
             }else{
@@ -38,7 +38,7 @@ public final class Monitor {
      * @return
      */
     public static boolean init(String fileName){
-        if (null!=getInstance().monitor && null != fileName){
+        if (null !=getInstance().monitor && null != fileName){
             return getInstance().monitor.initialize(fileName);
         }
         return false;

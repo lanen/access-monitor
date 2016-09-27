@@ -1,13 +1,10 @@
 package api.monitor.msec.org;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 
 /**
- * Created by Administrator on 2016/5/19.
+ * Created by even on 2016/9/29.
  */
 class AccessMonitor {
 
@@ -23,17 +20,26 @@ class AccessMonitor {
     private static AccessMonitor s_instance = new AccessMonitor();
 
 
+    private static boolean isOsSupported(){
+        return ! System.getProperty("os.name").toUpperCase().contains("WINDOWS");
+    }
+
     /**
      *
      * @param soFile
      */
     private static void load(String soFile){
 
-        if ( ! System.getProperty("os.name").toUpperCase().contains("WINDOWS") ) {
-            try {
-                InputStream in = AccessMonitor.class.getClass().getResourceAsStream(soFile);
-                File f = File.createTempFile("libjni_monitor", ".so");
-                OutputStream out = new FileOutputStream(f);
+        if (LOAD_SO)return;
+        if ( ! isOsSupported() )return;
+
+        InputStream in = AccessMonitor.class.getClass().getResourceAsStream(soFile);
+
+        try {
+            if (null != in){
+                System.out.println("copy so file from jar resource: "+ soFile);
+                File tmpFile = File.createTempFile("libjni_monitor", ".so");
+                OutputStream out = new FileOutputStream(tmpFile);
                 byte[] buf = new byte[10240];
                 while (true) {
                     int len = in.read(buf);
@@ -42,15 +48,58 @@ class AccessMonitor {
                     }
                     out.write(buf, 0, len);
                 }
-                in.close();
                 out.close();
-                System.load(f.getAbsolutePath());
+                System.load(tmpFile.getAbsolutePath());
                 LOAD_SO = true;
-                f.delete();
-            } catch (Exception e) {
-                e.printStackTrace();
+                tmpFile.delete();
+
+            }else {
+                loadSystemDefaulMonitorSo();
+                LOAD_SO = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            loadSystemDefaulMonitorSo();
+            LOAD_SO = true;
+        }finally {
+            if (null != in){
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
+    }
+
+
+    private static boolean LOAD_DEFAULT = false;
+
+    public static final String DEFAULT_SO_FILE = "/data/wildfly/native/libjni_monitor.so";
+    /**
+     * 加载系统默认
+     */
+    private static void loadSystemDefaulMonitorSo(){
+
+        if (LOAD_DEFAULT)return;
+
+        try{
+            File testExists = new File(DEFAULT_SO_FILE);
+
+            if (!testExists.exists()){
+                System.out.println("file :" + DEFAULT_SO_FILE + "not exits");
+                return;
+            }
+
+            System.out.println("system load jni file: "+DEFAULT_SO_FILE);
+            System.load(DEFAULT_SO_FILE);
+            LOAD_DEFAULT = true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public static AccessMonitor getInstance() {
@@ -99,7 +148,6 @@ class AccessMonitor {
         AccessMonitor.initServiceName("TestModuleName");
 
         AccessMonitor.add("test", 1);
-
 
     }
 }
